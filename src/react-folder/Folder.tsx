@@ -375,7 +375,9 @@ export default class Folder<T = any> extends React.PureComponent<
     // target < next => next is children
     // target > next => next is other parent
     const depthRange = [
-      targetDepth <= nextDepth ? nextDepth - targetDepth : this.getNextChildrenDepth(nextInfo) - targetDepth,
+      targetDepth <= nextDepth
+        ? nextDepth - targetDepth
+        : this.getNextChildrenDepth(nextInfo) - targetDepth,
       Math.max(targetDepth + 1, nextDepth) - targetDepth,
     ];
 
@@ -549,6 +551,7 @@ export default class Folder<T = any> extends React.PureComponent<
     nextSelected = this.flatChildren()
       .map((info) => info.path)
       .filter((flatPath) => nextSelected.indexOf(flatPath) > -1);
+
     if (!isEqualArray(selected!, nextSelected)) {
       onSelect!({
         selected: nextSelected,
@@ -563,7 +566,11 @@ export default class Folder<T = any> extends React.PureComponent<
     const parentFileInfo = targetInfo.parentFileInfo;
 
     if (parentFileInfo) {
-      const children = getChildren(childrenProperty, parentFileInfo.info, parentFileInfo.scope);
+      const children = getChildren(
+        childrenProperty,
+        parentFileInfo.info,
+        parentFileInfo.scope
+      );
 
       if (children && children.length === targetInfo.index + 1) {
         return this.getNextChildrenDepth(parentFileInfo);
@@ -657,6 +664,7 @@ export default class Folder<T = any> extends React.PureComponent<
         index,
       };
 
+      children.push(fileInfo);
       const nextScope = [...scope, id];
       const nextChildren = getChildren(childrenProperty, info, scope);
 
