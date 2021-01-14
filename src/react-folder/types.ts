@@ -4,6 +4,7 @@ export interface FileInfo<T> {
   id: string;
   scope: string[];
   path: string;
+  parentFileInfo: FileInfo<T> | null | undefined;
   parentInfo: T | null | undefined;
   parentPath: string;
   depth: number;

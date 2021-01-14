@@ -375,7 +375,7 @@ export default class Folder<T = any> extends React.PureComponent<
     // target < next => next is children
     // target > next => next is other parent
     const depthRange = [
-      nextDepth - targetDepth,
+      targetDepth <= nextDepth ? nextDepth - targetDepth : this.getNextChildrenDepth(nextInfo) - targetDepth,
       Math.max(targetDepth + 1, nextDepth) - targetDepth,
     ];
 
@@ -555,6 +555,22 @@ export default class Folder<T = any> extends React.PureComponent<
       });
     }
   };
+  private getNextChildrenDepth(targetInfo?: FileInfo<T>): number {
+    if (!targetInfo) {
+      return 0;
+    }
+    const childrenProperty = this.props.childrenProperty;
+    const parentFileInfo = targetInfo.parentFileInfo;
+
+    if (parentFileInfo) {
+      const children = getChildren(childrenProperty, parentFileInfo.info, parentFileInfo.scope);
+
+      if (children && children.length === targetInfo.index + 1) {
+        return this.getNextChildrenDepth(parentFileInfo);
+      }
+    }
+    return targetInfo.depth;
+  }
   private contains(
     paths: string[],
     path: string,
@@ -602,6 +618,7 @@ export default class Folder<T = any> extends React.PureComponent<
           id,
           path,
           parentInfo: parentInfo ? parentInfo.info : null,
+          parentFileInfo: parentInfo || null,
           parentPath,
           depth,
           scope,
@@ -618,7 +635,7 @@ export default class Folder<T = any> extends React.PureComponent<
     const children: Array<FileInfo<T>> = [];
 
     function push(
-      parentInfo: T | null,
+      parentFileInfo: FileInfo<T> | null,
       parentPath: string,
       info: T,
       index: number,
@@ -628,23 +645,24 @@ export default class Folder<T = any> extends React.PureComponent<
       const path = getPath!(pathProperty, id, scope, info, index);
       const depth = scope.length;
 
-      children.push({
+      const fileInfo = {
         id,
         path,
-        parentInfo,
+        parentInfo: parentFileInfo ? parentFileInfo.info : null,
+        parentFileInfo,
         parentPath,
         depth,
         scope,
         info,
         index,
-      });
+      };
 
       const nextScope = [...scope, id];
       const nextChildren = getChildren(childrenProperty, info, scope);
 
       if (nextChildren) {
         nextChildren.forEach((nextInfo, nextIndex) => {
-          push(info, path, nextInfo, nextIndex, nextScope);
+          push(fileInfo, path, nextInfo, nextIndex, nextScope);
         });
       }
     }
