@@ -20,6 +20,46 @@ $ npm i @scena/react-folder
 ```
 
 ## 🚀 How to use
+* React Folder's props
+```ts
+export interface FolderProps<T> {
+  infos: T[];
+  originalInfos?: T[];
+  FileComponent: ((props: FileProps<T>) => any) | typeof File;
+
+  scope?: string[];
+  selected?: string[] | null;
+  multiselect?: boolean;
+  isMove?: boolean;
+  showFoldIcon?: boolean;
+  isPadding?: boolean;
+  isMoveChildren?: boolean;
+  gap?: number;
+
+  fontColor?: string;
+  backgroundColor?: string;
+  selectedColor?: string;
+  borderColor?: string;
+  guidelineColor?: string;
+  iconColor?: string;
+
+  nameProperty?:
+    | (keyof T & string)
+    | ((value: T, index: any, scope: any[]) => any);
+  idProperty?:
+    | (keyof T & string)
+    | ((value: T, index: any, scope: any[]) => string);
+  childrenProperty?: (keyof T & string) | ((value: T, scope: any[]) => any);
+  pathProperty?:
+    | (keyof T & string)
+    | ((id: string, scope: any[], value: T, index: any) => string);
+
+  checkMove?: (prevInfo: FileInfo<T>) => boolean;
+  onMove?: (e: OnMove<T>) => any;
+  onSelect?: (e: OnSelect) => any;
+}
+```
+* App code
 ```tsx
 import React from "react";
 import Folder, { FileProps } from "@scena/react-folder";
