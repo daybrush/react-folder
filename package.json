@@ -1,6 +1,6 @@
 {
   "name": "@scena/react-folder",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "types": "./declaration/index.d.ts",
   "main": "./dist/folder.cjs.js",
   "module": "./dist/folder.esm.js",

@@ -374,12 +374,17 @@ export default class Folder<T = any> extends React.PureComponent<
     // target = next => same children
     // target < next => next is children
     // target > next => next is other parent
+    const childrenDepth = this.getNextChildrenDepth(nextInfo);
     const depthRange = [
       targetDepth <= nextDepth
         ? nextDepth - targetDepth
-        : this.getNextChildrenDepth(nextInfo) - targetDepth,
+        : childrenDepth - targetDepth,
       Math.max(targetDepth + 1, nextDepth) - targetDepth,
     ];
+
+    if (targetDepth <= nextDepth && childrenDepth < nextDepth && selected.indexOf(nextInfo.path) > -1) {
+      --depthRange[0];
+    }
 
     let distDepth = isTop
       ? 0
