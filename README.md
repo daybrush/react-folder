@@ -1,6 +1,6 @@
 
 
-<p align="middle" ><img src="https://raw.githubusercontent.com/daybrush/react-folder/master/public/images/logo.png"/></p>
+<p align="middle" ><img src="https://raw.githubusercontent.com/daybrush/react-folder/master/public/logo.png"/></p>
 <h2 align="middle">React Folder</h2>
 <p align="middle">
 <a href="https://www.npmjs.com/package/@scena/react-folder" target="_blank"><img src="https://img.shields.io/npm/v/@scena/react-folder.svg?style=flat-square&color=007acc&label=version" alt="npm version" /></a>
