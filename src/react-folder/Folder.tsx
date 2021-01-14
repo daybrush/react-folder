@@ -382,8 +382,12 @@ export default class Folder<T = any> extends React.PureComponent<
       Math.max(targetDepth + 1, nextDepth) - targetDepth,
     ];
 
-    if (targetDepth <= nextDepth && childrenDepth < nextDepth && selected.indexOf(nextInfo.path) > -1) {
-      --depthRange[0];
+    if (
+      targetDepth <= nextDepth &&
+      nextInfo &&
+      selected.indexOf(nextInfo.path) > -1
+    ) {
+      depthRange[0] += Math.min(0, childrenDepth - nextDepth);
     }
 
     let distDepth = isTop
