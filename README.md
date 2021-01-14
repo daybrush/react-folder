@@ -9,7 +9,8 @@
 </p>
 <p align="middle">A React Folder component that can fold, sort, and move lists.</p>
 <p align="middle">
-    <a href="https://github.com/daybrush/scena" target="_blank"><strong>Main Project</strong></a>
+  <a href="https://codesandbox.io/s/react-folder-demo-0p7i2"><strong>Demo</strong></a>
+  <a href="https://github.com/daybrush/scena" target="_blank"><strong>Main Project</strong></a>
 </p>
 
 
