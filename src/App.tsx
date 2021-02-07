@@ -50,7 +50,7 @@ function App() {
             e.parentInfo.info.children = e.children;
             setInfos([...infos]);
           } else {
-            setInfos([...e.children]);  
+            setInfos([...e.children]);
           }
         }}
         onSelect={e => {

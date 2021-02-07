@@ -119,14 +119,14 @@ function getCurrentFile(target: HTMLElement) {
 export default class Folder<T = any> extends React.PureComponent<
   FolderProps<T>,
   FolderState<T>
-> {
+  > {
   public static defaultProps = {
     scope: [],
     name: "",
     selected: [],
-    onMove: () => {},
+    onMove: () => { },
     checkMove: () => true,
-    onSelect: () => {},
+    onSelect: () => { },
     gap: 20,
 
     pathProperty: (id: string, scope: string[]) => [...scope, id].join("///"),
@@ -214,7 +214,7 @@ export default class Folder<T = any> extends React.PureComponent<
   }
   public componentDidMount() {
     KeyController.setGlobal();
-    if (this.props.isMove) {
+    if (!this.props.isChild) {
       const folderElement = this.folderRef.current!.getElement();
       this.moveGesto = new Gesto(folderElement, {
         container: window,
@@ -265,7 +265,16 @@ export default class Folder<T = any> extends React.PureComponent<
       e.stop();
       return false;
     }
+    const clickedFile: HTMLElement = getCurrentFile(e.inputEvent.target);
     const folderElement = this.folderRef.current!.getElement();
+
+    if (!this.props.isMove) {
+      if (clickedFile) {
+        this.onClickFile({ currentTarget: clickedFile });
+      }
+      e.stop();
+      return false;
+    }
     const rect = folderElement.getBoundingClientRect();
     const datas = e.datas;
     const offsetX = e.clientX - rect.left;
@@ -283,7 +292,7 @@ export default class Folder<T = any> extends React.PureComponent<
     datas.fileMap = this.flatMap(fileInfos);
     datas.fileInfos = fileInfos;
 
-    const clickedFile: HTMLElement = getCurrentFile(e.inputEvent.target);
+
     const selected = this.props.selected!;
 
     if (
@@ -393,10 +402,10 @@ export default class Folder<T = any> extends React.PureComponent<
     let distDepth = isTop
       ? 0
       : between(
-          Math.round((distX > 0 ? distX * 0.2 : distX - gap! / 10) / gap!),
-          depthRange[0],
-          depthRange[1]
-        );
+        Math.round((distX > 0 ? distX * 0.2 : distX - gap! / 10) / gap!),
+        depthRange[0],
+        depthRange[1]
+      );
     if (
       nextInfo &&
       !isTop &&
@@ -532,9 +541,8 @@ export default class Folder<T = any> extends React.PureComponent<
       return;
     }
     const datas = e.datas;
-    el.style.cssText = `display: block; transform: translate(${
-      e.clientX - rect.left - datas.offsetX
-    }px, ${e.clientY - rect.top}px) translateY(-50%)`;
+    el.style.cssText = `display: block; transform: translate(${e.clientX - rect.left - datas.offsetX
+      }px, ${e.clientY - rect.top}px) translateY(-50%)`;
   }
   private onClickFile = ({ currentTarget }: any) => {
     const path = currentTarget.getAttribute("data-file-path")!;

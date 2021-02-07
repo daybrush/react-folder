@@ -75,6 +75,7 @@ export default class FileManager<T = {}> extends React.PureComponent<
             gap={gap}
             multiselect={multiselect}
             originalInfos={originalInfos}
+            isChild={true}
           />
         )}
       </div>

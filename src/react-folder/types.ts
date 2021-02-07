@@ -42,6 +42,7 @@ export interface FileManagerProps<T extends {}> {
   pathProperty?:
     | (keyof T & string)
     | ((id: string, scope: any[], value: T, index: any) => string);
+
 }
 
 export interface FolderProps<T> {
@@ -79,6 +80,7 @@ export interface FolderProps<T> {
   checkMove?: (prevInfo: FileInfo<T>) => boolean;
   onMove?: (e: OnMove<T>) => any;
   onSelect?: (e: OnSelect) => any;
+  isChild?: boolean;
 }
 
 export interface FolderState<T> {
