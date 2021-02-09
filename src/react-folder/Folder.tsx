@@ -72,7 +72,6 @@ const FolderElement = styled(
 .file {
   position: relative;
   box-sizing: border-box;
-  padding: 2px;
   border-bottom: 1px solid var(--folder-border-color);
   width: 100%;
   box-sizing: border-box;
