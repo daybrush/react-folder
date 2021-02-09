@@ -5,7 +5,7 @@ import { getChildren, getId, getName, getPath, prefix } from "./utils";
 
 export default class FileManager<T = {}> extends React.PureComponent<
   FileManagerProps<T>
-> {
+  > {
   public static defaultProps = {};
   state = {
     fold: false,
@@ -34,24 +34,24 @@ export default class FileManager<T = {}> extends React.PureComponent<
     const nextScope = [...scope, id];
     const length = scope.length;
     const isFolder = children && children.length > 0;
-
+    const gapWidth = gap! * (length + 1);
     return (
       <div className={prefix("property")}>
         <div
           className={prefix("file", this.isSelected(path) ? "selected" : "")}
           data-file-path={path}
           style={{
-            [isPadding ? "paddingLeft" : "marginLeft"]: `${gap! * length}px`,
-            width: isPadding ? "100%" : `calc(100% - ${gap! * length}px)`,
+            [isPadding ? "paddingLeft" : "marginLeft"]: `${gapWidth}px`,
+            width: isPadding ? "100%" : `calc(100% - ${gapWidth}px)`,
           }}
         >
-          {isFolder && showFoldIcon && (
-            <div
-              className={prefix("fold-icon", this.state.fold ? "fold" : "")}
-              onClick={this.onClickFold}
-            ></div>
-          )}
           <div className={prefix("file-name")}>
+            {isFolder && showFoldIcon && (
+              <div
+                className={prefix("fold-icon", this.state.fold ? "fold" : "")}
+                onClick={this.onClickFold}
+              ></div>
+            )}
             <FileComponent<T>
               scope={scope}
               name={name}

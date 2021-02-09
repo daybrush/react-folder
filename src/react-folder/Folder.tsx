@@ -44,11 +44,14 @@ const FolderElement = styled(
   --folder-font-color: inherit;
 }
 .fold-icon {
-  position: relative;
+  position: absolute;
   display: inline-block;
   vertical-align: middle;
-  width: 20px;
+  width: 15px;
   height: 20px;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
 }
 .fold-icon:before {
   content: "";
@@ -78,6 +81,7 @@ const FolderElement = styled(
   color: var(--folder-font-color);
 }
 .file .file-name {
+  position: relative;
   display: inline-block;
   flex: 1;
 }
@@ -127,8 +131,7 @@ export default class Folder<T = any> extends React.PureComponent<
     onMove: () => { },
     checkMove: () => true,
     onSelect: () => { },
-    gap: 20,
-
+    gap: 15,
     pathProperty: (id: string, scope: string[]) => [...scope, id].join("///"),
     idProperty: (_: any, index: number) => index,
     nameProperty: (_: any, index: number) => index,
@@ -150,7 +153,7 @@ export default class Folder<T = any> extends React.PureComponent<
   public render() {
     const {
       scope,
-      gap = 10,
+      gap,
       isPadding,
       infos,
       selected,
@@ -231,7 +234,7 @@ export default class Folder<T = any> extends React.PureComponent<
     }
   }
   private renderShadows() {
-    const { FileComponent, nameProperty, scope } = this.props;
+    const { FileComponent, nameProperty, scope, isPadding, gap } = this.props;
     if (scope!.length) {
       return;
     }
@@ -246,8 +249,12 @@ export default class Folder<T = any> extends React.PureComponent<
             index,
           } = info;
           const name = getName(nameProperty, infoValue, index, scope);
+          const gapWidth = gap! * (scope.length + 1);
           return (
-            <div key={path} className={prefix("file", "selected", "shadow")}>
+            <div key={path} className={prefix("file", "selected", "shadow")} style={{
+              [isPadding ? "paddingLeft" : "marginLeft"]: `${gapWidth}px`,
+              width: isPadding ? "100%" : `calc(100% - ${gapWidth}px)`,
+            }}>
               <FileComponent<T>
                 scope={fileScope}
                 name={name}
@@ -378,7 +385,7 @@ export default class Folder<T = any> extends React.PureComponent<
     // const prevDepth = prevInfo ? prevInfo.depth : 0;
     const targetDepth = targetInfo.depth;
     const nextDepth = nextInfo ? nextInfo.depth : 0;
-    const distX = clientX - folderRect.left - targetDepth * gap!;
+    const distX = clientX - folderRect.left - (targetDepth + 1) * gap!;
 
     // target = next => same children
     // target < next => next is children
@@ -438,7 +445,8 @@ export default class Folder<T = any> extends React.PureComponent<
     } else if (distDepth > 0 && !checkMove!(targetInfo)) {
       distDepth = 0;
     }
-    const guidelineX = (targetDepth + distDepth) * gap!;
+    const guidelineDepth = targetDepth + distDepth;
+    const guidelineX = guidelineDepth ? (guidelineDepth + 1) * gap! : 0;
     const guidelineY =
       targetRect.top - folderRect.top + (isTop ? 0 : targetRect.height);
     this.guidelineElement.style.cssText = `display: block;top: ${guidelineY}px;left: ${guidelineX}px; width: calc(100% - ${guidelineX}px);`;
