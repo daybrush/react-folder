@@ -58,6 +58,7 @@ export interface FolderProps<T> {
   isPadding?: boolean;
   isMoveChildren?: boolean;
   gap?: number;
+  fold?: boolean;
 
   fontColor?: string;
   backgroundColor?: string;

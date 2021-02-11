@@ -170,6 +170,7 @@ export default class Folder<T = any> extends React.PureComponent<
       guidelineColor,
       selectedColor,
       originalInfos,
+      fold,
     } = this.props;
 
     return (
@@ -183,6 +184,7 @@ export default class Folder<T = any> extends React.PureComponent<
           "--folder-guideline-color": guidelineColor,
           "--folder-selected-color": selectedColor,
           "--folder-font-color": fontColor,
+          display: fold ? "none" : "block",
         }}
       >
         {infos.map((info, index) => {

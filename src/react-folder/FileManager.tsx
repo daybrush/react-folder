@@ -60,7 +60,7 @@ export default class FileManager<T = {}> extends React.PureComponent<
             />
           </div>
         </div>
-        {isFolder && !this.state.fold && (
+        {isFolder && (
           <Folder<T>
             scope={nextScope}
             infos={children}
@@ -76,6 +76,7 @@ export default class FileManager<T = {}> extends React.PureComponent<
             multiselect={multiselect}
             originalInfos={originalInfos}
             isChild={true}
+            fold={this.state.fold}
           />
         )}
       </div>
