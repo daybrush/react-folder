@@ -7,7 +7,8 @@ export default class FileManager<T = {}> extends React.PureComponent<
   FileManagerProps<T>
   > {
   public static defaultProps = {};
-  state = {
+  public folderRef = React.createRef<Folder>();
+  public state = {
     fold: false,
   };
   render() {
@@ -62,6 +63,7 @@ export default class FileManager<T = {}> extends React.PureComponent<
         </div>
         {isFolder && (
           <Folder<T>
+            ref={this.folderRef}
             scope={nextScope}
             infos={children}
             FileComponent={FileComponent}
@@ -76,7 +78,7 @@ export default class FileManager<T = {}> extends React.PureComponent<
             multiselect={multiselect}
             originalInfos={originalInfos}
             isChild={true}
-            fold={this.state.fold}
+            display={this.state.fold ? "none" : "block"}
           />
         )}
       </div>
@@ -101,6 +103,33 @@ export default class FileManager<T = {}> extends React.PureComponent<
     this.setState({
       fold: false,
     });
+  }
+  public isFold() {
+    return this.state.fold;
+  }
+  public findFile(targetPath: string): FileManager<T> | null {
+    const {
+      childrenProperty,
+      pathProperty,
+      idProperty,
+      index,
+      info,
+      scope,
+    } = this.props;
+    const id = getId(idProperty, info, index, scope);
+    const children = getChildren(childrenProperty, info, scope);
+    const path = getPath!(pathProperty, id, scope, info, index);
+
+    if (targetPath === path) {
+      return this;
+    }
+    const childFolder = this.folderRef.current;
+
+    if (!children || !children.length || !childFolder) {
+      return null;
+    }
+
+    return childFolder.findFile(targetPath);
   }
   private onClickFold = (e: any) => {
     e.stopPropagation();

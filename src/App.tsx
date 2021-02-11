@@ -28,6 +28,9 @@ function App() {
   return (
     <div className="App">
       <Folder<Info>
+        ref={e => {
+          e && ((window as any).a = e);
+        }}
         infos={infos}
         FileComponent={FileComponent}
         nameProperty="name"

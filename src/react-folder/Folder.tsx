@@ -12,7 +12,7 @@ import KeyController from "keycon";
 import Gesto, { OnDrag, OnDragStart, OnDragEnd } from "gesto";
 import styled, { StyledElement } from "react-css-styled";
 import { FileInfo, FolderProps, FolderState } from "./types";
-import { prefixCSS, ref } from "framework-utils";
+import { prefixCSS, ref, refs } from "framework-utils";
 import { PREFIX } from "./consts";
 import FileManager from "./FileManager";
 
@@ -144,11 +144,7 @@ export default class Folder<T = any> extends React.PureComponent<
     fold: false,
     shadows: [],
   };
-  public isSelected(key: string) {
-    const selected = this.props.selected;
-
-    return selected && selected.indexOf(key) > -1;
-  }
+  private fileManagers: Array<FileManager<T>> = [];
   public render() {
     const {
       scope,
@@ -170,9 +166,11 @@ export default class Folder<T = any> extends React.PureComponent<
       guidelineColor,
       selectedColor,
       originalInfos,
-      fold,
+      display,
     } = this.props;
 
+
+    this.fileManagers = [];
     return (
       <FolderElement
         className={prefix("folder")}
@@ -184,12 +182,13 @@ export default class Folder<T = any> extends React.PureComponent<
           "--folder-guideline-color": guidelineColor,
           "--folder-selected-color": selectedColor,
           "--folder-font-color": fontColor,
-          display: fold ? "none" : "block",
+          display: display || "block",
         }}
       >
         {infos.map((info, index) => {
           return (
             <FileManager<T>
+              ref={refs(this, "fileManagers", index)}
               key={index}
               index={index}
               info={info}
@@ -233,6 +232,39 @@ export default class Folder<T = any> extends React.PureComponent<
     if (this.moveGesto) {
       this.moveGesto.unset();
     }
+  }
+  public isSelected(targetPath: string) {
+    const selected = this.props.selected;
+
+    return selected && selected.indexOf(targetPath) > -1;
+  }
+  public findFile(targetPath: string): FileManager<T> | null {
+    const fileManagers = this.fileManagers;
+    const length = fileManagers.length;
+
+    for (let i = 0; i < length; ++i) {
+      const file = fileManagers[i].findFile(targetPath);
+
+      if (file) {
+        return file;
+      }
+    }
+    return null;
+  }
+  public fold(targetPath: string) {
+    const file = this.findFile(targetPath);
+
+    file?.fold();
+  }
+  public unfold(targetPath: string) {
+    const file = this.findFile(targetPath);
+
+    file?.unfold();
+  }
+  public isFold(targetPath: string) {
+    const file = this.findFile(targetPath);
+
+    return file ? file.isFold() : false;
   }
   private renderShadows() {
     const { FileComponent, nameProperty, scope, isPadding, gap } = this.props;
