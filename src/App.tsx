@@ -25,6 +25,7 @@ function App() {
     { name: "hi2", children: [{ name: "sub hi2", children: [] }] },
   ]);
   const [selected, setSelected] = React.useState<any[]>([]);
+  const [folded, setFolded] = React.useState<any[]>([]);
   return (
     <div className="App">
       <Folder<Info>
@@ -37,6 +38,7 @@ function App() {
         childrenProperty="children"
         selectedColor={"#4fa"}
         selected={selected}
+        folded={folded}
         multiselect={true}
         isPadding={true}
         isMove={true}
@@ -59,6 +61,10 @@ function App() {
         onSelect={e => {
           console.log(e);
           setSelected(e.selected);
+        }}
+        onFold={e => {
+          console.log(e);
+          setFolded(e.folded);
         }}
       />
     </div>

@@ -24,6 +24,7 @@ export interface FileManagerProps<T extends {}> {
   info: T;
   scope: string[];
   selected: string[];
+  folded: string[];
   multiselect?: boolean;
   FileComponent: ((props: FileProps<T>) => any) | typeof File;
 
@@ -42,7 +43,6 @@ export interface FileManagerProps<T extends {}> {
   pathProperty?:
     | (keyof T & string)
     | ((id: string, scope: any[], value: T, index: any) => string);
-
 }
 
 export interface FolderProps<T> {
@@ -52,6 +52,7 @@ export interface FolderProps<T> {
 
   scope?: string[];
   selected?: string[] | null;
+  folded?: string[] | null;
   multiselect?: boolean;
   isMove?: boolean;
   showFoldIcon?: boolean;
@@ -81,11 +82,11 @@ export interface FolderProps<T> {
   checkMove?: (prevInfo: FileInfo<T>) => boolean;
   onMove?: (e: OnMove<T>) => any;
   onSelect?: (e: OnSelect) => any;
+  onFold?: (e: OnFold) => any;
   isChild?: boolean;
 }
 
 export interface FolderState<T> {
-  fold: boolean;
   shadows: Array<FileInfo<T>>;
 }
 
@@ -97,5 +98,13 @@ export interface OnMove<T> {
   prevInfo: FileInfo<T> | null | undefined;
 }
 export interface OnSelect {
+  path: string;
+  isSelected: boolean;
   selected: string[];
+}
+
+export interface OnFold {
+  path: string;
+  isFolded: boolean;
+  folded: string[];
 }

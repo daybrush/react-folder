@@ -11,7 +11,7 @@ import { IObject, findIndex, hasClass, between, find } from "@daybrush/utils";
 import KeyController from "keycon";
 import Gesto, { OnDrag, OnDragStart, OnDragEnd } from "gesto";
 import styled, { StyledElement } from "react-css-styled";
-import { FileInfo, FolderProps, FolderState } from "./types";
+import { FileInfo, FolderProps, FolderState, OnFold } from "./types";
 import { prefixCSS, ref, refs } from "framework-utils";
 import { PREFIX } from "./consts";
 import FileManager from "./FileManager";
@@ -141,7 +141,6 @@ export default class Folder<T = any> extends React.PureComponent<
   public shadowRef = React.createRef<HTMLDivElement>();
   public guidelineElement!: HTMLElement;
   public state: FolderState<T> = {
-    fold: false,
     shadows: [],
   };
   private fileManagers: Array<FileManager<T>> = [];
@@ -152,6 +151,7 @@ export default class Folder<T = any> extends React.PureComponent<
       isPadding,
       infos,
       selected,
+      folded,
       multiselect,
       FileComponent,
       nameProperty,
@@ -168,7 +168,6 @@ export default class Folder<T = any> extends React.PureComponent<
       originalInfos,
       display,
     } = this.props;
-
 
     this.fileManagers = [];
     return (
@@ -194,6 +193,7 @@ export default class Folder<T = any> extends React.PureComponent<
               info={info}
               scope={scope!}
               selected={selected!}
+              folded={folded!}
               FileComponent={FileComponent}
               isPadding={isPadding}
               gap={gap}
@@ -233,10 +233,15 @@ export default class Folder<T = any> extends React.PureComponent<
       this.moveGesto.unset();
     }
   }
-  public isSelected(targetPath: string) {
+  public isSelected(path: string) {
     const selected = this.props.selected;
 
-    return selected && selected.indexOf(targetPath) > -1;
+    return selected && selected.indexOf(path) > -1;
+  }
+  public isFolded(path: string) {
+    const folded = this.props.folded;
+
+    return folded && folded.indexOf(path) > -1;
   }
   public findFile(targetPath: string): FileManager<T> | null {
     const fileManagers = this.fileManagers;
@@ -250,21 +255,6 @@ export default class Folder<T = any> extends React.PureComponent<
       }
     }
     return null;
-  }
-  public fold(targetPath: string) {
-    const file = this.findFile(targetPath);
-
-    file?.fold();
-  }
-  public unfold(targetPath: string) {
-    const file = this.findFile(targetPath);
-
-    file?.unfold();
-  }
-  public isFold(targetPath: string) {
-    const file = this.findFile(targetPath);
-
-    return file ? file.isFold() : false;
   }
   private renderShadows() {
     const { FileComponent, nameProperty, scope, isPadding, gap } = this.props;
@@ -301,11 +291,13 @@ export default class Folder<T = any> extends React.PureComponent<
     );
   }
   private onDragStart = (e: OnDragStart) => {
+    const clickedFile: HTMLElement = getCurrentFile(e.inputEvent.target);
+
     if (hasClass(e.inputEvent.target, prefix("fold-icon"))) {
       e.stop();
+      this.onClickFold(clickedFile);
       return false;
     }
-    const clickedFile: HTMLElement = getCurrentFile(e.inputEvent.target);
     const folderElement = this.folderRef.current!.getElement();
 
     if (!this.props.isMove) {
@@ -589,6 +581,7 @@ export default class Folder<T = any> extends React.PureComponent<
     const path = currentTarget.getAttribute("data-file-path")!;
     const { multiselect, onSelect, selected } = this.props;
 
+    let isSelected = false;
     let nextSelected: string[];
     if (multiselect) {
       nextSelected = (selected || []).slice();
@@ -598,12 +591,15 @@ export default class Folder<T = any> extends React.PureComponent<
         if (index > -1) {
           nextSelected.splice(index, 1);
         } else {
+          isSelected = true;
           nextSelected.push(path);
         }
       } else {
+        isSelected = true;
         nextSelected = [path];
       }
     } else {
+      isSelected = true;
       nextSelected = [path];
     }
     nextSelected = this.flatChildren()
@@ -612,6 +608,8 @@ export default class Folder<T = any> extends React.PureComponent<
 
     if (!isEqualArray(selected!, nextSelected)) {
       onSelect!({
+        path,
+        isSelected,
         selected: nextSelected,
       });
     }
@@ -740,5 +738,24 @@ export default class Folder<T = any> extends React.PureComponent<
   }
   private clearGuideline() {
     this.guidelineElement.style.display = "none";
+  }
+  private onClickFold = (target: HTMLElement) => {
+    const path = target.getAttribute("data-file-path")!;
+
+    const folded = [...(this.props.folded || [])];
+    const onFold = this.props.onFold;
+    const index = folded.indexOf(path);
+    const isFolded = index > -1;
+
+    if (isFolded) {
+      folded.splice(index, 1);
+    } else {
+      folded.push(path);
+    }
+    onFold && onFold({
+      path,
+      isFolded: !isFolded,
+      folded,
+    });
   }
 }

@@ -8,10 +8,7 @@ export default class FileManager<T = {}> extends React.PureComponent<
   > {
   public static defaultProps = {};
   public folderRef = React.createRef<Folder>();
-  public state = {
-    fold: false,
-  };
-  render() {
+  public render() {
     const {
       childrenProperty,
       pathProperty,
@@ -26,6 +23,7 @@ export default class FileManager<T = {}> extends React.PureComponent<
       gap,
       multiselect,
       selected,
+      folded,
       originalInfos,
     } = this.props;
     const id = getId(idProperty, info, index, scope);
@@ -36,6 +34,7 @@ export default class FileManager<T = {}> extends React.PureComponent<
     const length = scope.length;
     const isFolder = children && children.length > 0;
     const gapWidth = gap! * (length + 1);
+    const isFolded = this.isFolded(path);
     return (
       <div className={prefix("property")}>
         <div
@@ -49,8 +48,7 @@ export default class FileManager<T = {}> extends React.PureComponent<
           <div className={prefix("file-name")}>
             {isFolder && showFoldIcon && (
               <div
-                className={prefix("fold-icon", this.state.fold ? "fold" : "")}
-                onClick={this.onClickFold}
+                className={prefix("fold-icon", isFolded ? "fold" : "")}
               ></div>
             )}
             <FileComponent<T>
@@ -73,39 +71,27 @@ export default class FileManager<T = {}> extends React.PureComponent<
             childrenProperty={childrenProperty}
             showFoldIcon={showFoldIcon}
             selected={selected}
+            folded={folded}
             isPadding={isPadding}
             gap={gap}
             multiselect={multiselect}
             originalInfos={originalInfos}
             isChild={true}
-            display={this.state.fold ? "none" : "block"}
+            display={isFolded ? "none" : "block"}
           />
         )}
       </div>
     );
   }
-  public isSelected(key: string) {
+  public isSelected(path: string) {
     const selected = this.props.selected;
 
-    return selected && selected.indexOf(key) > -1;
+    return selected && selected.indexOf(path) > -1;
   }
-  public toggleFold() {
-    this.setState({
-      fold: !this.state.fold,
-    });
-  }
-  public fold() {
-    this.setState({
-      fold: true,
-    });
-  }
-  public unfold() {
-    this.setState({
-      fold: false,
-    });
-  }
-  public isFold() {
-    return this.state.fold;
+  public isFolded(path: string) {
+    const folded = this.props.folded;
+
+    return folded && folded.indexOf(path) > -1;
   }
   public findFile(targetPath: string): FileManager<T> | null {
     const {
@@ -131,9 +117,4 @@ export default class FileManager<T = {}> extends React.PureComponent<
 
     return childFolder.findFile(targetPath);
   }
-  private onClickFold = (e: any) => {
-    e.stopPropagation();
-
-    this.toggleFold();
-  };
 }
