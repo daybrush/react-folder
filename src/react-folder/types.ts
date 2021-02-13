@@ -1,3 +1,4 @@
+import { OnDragStart } from "gesto";
 import File from "./File";
 
 export interface FileInfo<T> {
@@ -80,6 +81,7 @@ export interface FolderProps<T> {
     | ((id: string, scope: any[], value: T, index: any) => string);
 
   checkMove?: (prevInfo: FileInfo<T>) => boolean;
+  dragCondtion?: (e: OnDragStart) => boolean;
   onMove?: (e: OnMove<T>) => any;
   onSelect?: (e: OnSelect) => any;
   onFold?: (e: OnFold) => any;

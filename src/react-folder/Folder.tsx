@@ -307,6 +307,12 @@ export default class Folder<T = any> extends React.PureComponent<
       e.stop();
       return false;
     }
+    const dragCondtion = this.props.dragCondtion || (() => true);
+
+    if (!dragCondtion(e)) {
+      e.stop();
+      return false;
+    }
     const rect = folderElement.getBoundingClientRect();
     const datas = e.datas;
     const offsetX = e.clientX - rect.left;
