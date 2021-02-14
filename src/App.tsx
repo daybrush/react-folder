@@ -21,7 +21,11 @@ function FileComponent(props: FileProps<Info>) {
 }
 function App() {
   const [infos, setInfos] = React.useState<Info[]>([
-    { name: "hi", children: [{ name: "sub hi", children: [] }] },
+    { name: "hi", children: [
+      { name: "sub hi 1-1", children: [] },
+      { name: "sub hi 1-2", children: [] },
+      { name: "sub hi 1-3", children: [] }
+    ] },
     { name: "hi2", children: [{ name: "sub hi2", children: [] }] },
   ]);
   const [selected, setSelected] = React.useState<any[]>([]);
@@ -42,6 +46,7 @@ function App() {
         multiselect={true}
         isPadding={true}
         isMove={true}
+        isMoveChildren={true}
         idProperty={"name"}
         pathProperty={"name"}
         onMove={e => {

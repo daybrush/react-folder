@@ -1,7 +1,7 @@
 import { isString } from "@daybrush/utils";
 import { prefixNames } from "framework-utils";
 import { PREFIX } from "./consts";
-import { FolderProps } from "./types";
+import { FileInfo, FolderProps } from "./types";
 
 export function prefix(...classNames: string[]) {
   return prefixNames(PREFIX, ...classNames);
@@ -53,4 +53,14 @@ export function isEqualArray<T>(
   b: T[],
 ) {
   return a.length === b.length && a.every((v, i) => v === b[i]);
+}
+
+export function findParentFileInfo(fileInfo: FileInfo<any> | null | undefined, path: string): FileInfo<any> | null {
+  if (!fileInfo) {
+    return null;
+  }
+  if (fileInfo.path === path) {
+    return fileInfo;
+  }
+  return findParentFileInfo(fileInfo.parentFileInfo, path);
 }

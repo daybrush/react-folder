@@ -1,5 +1,6 @@
 import * as React from "react";
 import {
+  findParentFileInfo,
   getChildren,
   getId,
   getName,
@@ -11,7 +12,7 @@ import { IObject, findIndex, hasClass, between, find } from "@daybrush/utils";
 import KeyController from "keycon";
 import Gesto, { OnDrag, OnDragStart, OnDragEnd } from "gesto";
 import styled, { StyledElement } from "react-css-styled";
-import { FileInfo, FolderProps, FolderState, OnFold } from "./types";
+import { FileInfo, FolderProps, FolderState } from "./types";
 import { prefixCSS, ref, refs } from "framework-utils";
 import { PREFIX } from "./consts";
 import FileManager from "./FileManager";
@@ -386,12 +387,12 @@ export default class Folder<T = any> extends React.PureComponent<
     if (!targetElement) {
       return;
     }
-    let tarpathProperty = targetElement.getAttribute("data-file-path")!;
+    let targetPath = targetElement.getAttribute("data-file-path")!;
     let targetRect = targetElement.getBoundingClientRect();
     let isTop = targetRect.top + targetRect.height / 2 > clientY;
     let targetIndex = findIndex(
       fileInfos,
-      (info) => info.path === tarpathProperty
+      (info) => info.path === targetPath
     );
     let targetInfo = fileInfos[targetIndex];
     let prevInfo = fileInfos[targetIndex - 1];
@@ -400,9 +401,9 @@ export default class Folder<T = any> extends React.PureComponent<
       --targetIndex;
       targetInfo = prevInfo;
       prevInfo = fileInfos[targetIndex - 1];
-      tarpathProperty = targetInfo.path;
+      targetPath = targetInfo.path;
       targetElement = folderElement.querySelector<HTMLElement>(
-        `[data-file-path="${tarpathProperty}"]`
+        `[data-file-path="${targetPath}"]`
       )!;
 
       if (!targetElement) {
@@ -452,24 +453,48 @@ export default class Folder<T = any> extends React.PureComponent<
     ) {
       return;
     }
-    if (this.contains(selected, tarpathProperty, fileMap)) {
+    if (this.contains(selected, targetPath, fileMap)) {
       return;
     }
-    if (selected.indexOf(tarpathProperty) > -1 && distDepth >= 0) {
+    if (selected.indexOf(targetPath) > -1 && distDepth >= 0) {
       return;
     }
 
     if (isMoveChildren) {
       const parentPath = targetInfo.parentPath;
 
-      if (selectedInfos.every((info) => info.parentPath === parentPath)) {
+      if (!selectedInfos.length) {
+        return;
+      }
+      const selectedParentPath = selectedInfos[0].parentPath;
+      const selectedParentInfo = selectedInfos[0].parentFileInfo;
+      if (selectedInfos.some((info) => info.parentPath !== selectedParentPath)) {
+        return;
+      }
+
+      // targetInfo(1) - nextInfo(1)
+      if (selectedParentPath === parentPath && (isTop || targetDepth === nextDepth)) {
         // same parent path
         distDepth = 0;
       } else if (
-        // target >> selected
-        selectedInfos.every((info) => info.parentPath === tarpathProperty)
+        // targetInfo(0) - nextInfo(1)
+        selectedParentPath === targetPath
       ) {
         distDepth = 1;
+      } else if (
+        // targetInfo(1) - nextInfo(null)
+        targetDepth > nextDepth && !selectedParentInfo
+      ) {
+        // targetInfo(1) - nextInfo(0)
+        distDepth = -targetDepth;
+      } else if (targetDepth > nextDepth) {
+        const parentInfo = findParentFileInfo(targetInfo, selectedParentPath);
+
+        if (parentInfo) {
+          distDepth = parentInfo.depth - targetDepth + 1;
+        } else {
+          return;
+        }
       } else {
         return;
       }
