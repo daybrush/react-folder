@@ -128,6 +128,7 @@ export default class Folder<T = any> extends React.PureComponent<
     scope: [],
     name: "",
     selected: [],
+    folded: [],
     onMove: () => { },
     checkMove: () => true,
     onSelect: () => { },
@@ -725,7 +726,7 @@ export default class Folder<T = any> extends React.PureComponent<
     return [];
   }
   private flatChildren() {
-    const { pathProperty, idProperty, childrenProperty, infos } = this.props;
+    const { pathProperty, idProperty, childrenProperty, infos, folded } = this.props;
     const children: Array<FileInfo<T>> = [];
 
     function push(
@@ -755,7 +756,7 @@ export default class Folder<T = any> extends React.PureComponent<
       const nextScope = [...scope, id];
       const nextChildren = getChildren(childrenProperty, info, scope);
 
-      if (nextChildren) {
+      if (nextChildren && folded!.indexOf(path) === -1) {
         nextChildren.forEach((nextInfo, nextIndex) => {
           push(fileInfo, path, nextInfo, nextIndex, nextScope);
         });
