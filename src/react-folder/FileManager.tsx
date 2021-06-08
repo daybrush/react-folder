@@ -83,6 +83,9 @@ export default class FileManager<T = {}> extends React.PureComponent<
       </div>
     );
   }
+  public getInfo(): T {
+    return this.props.info;
+  }
   public isSelected(path: string) {
     const selected = this.props.selected;
 
