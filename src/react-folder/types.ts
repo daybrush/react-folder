@@ -14,7 +14,18 @@ export interface FileInfo<T> {
     index: number;
     value: T;
 }
-
+export type FoldIconProps<T = any, U = {}> = FileProps<T, U> & {
+    className: string;
+    isFolded: boolean;
+    isSelected: boolean;
+}
+export type FileWrapperProps<T = any, U = {}> = FileProps<T, U> & {
+    className: string;
+    gapWidth: number;
+    isSelected: boolean;
+    isShadow?: boolean;
+    style: Record<string, any>;
+};
 export type FileProps<T = any, U = {}> = {
     name: string;
     scope: string[];
@@ -30,19 +41,22 @@ export interface FileManagerProps<T extends {}> {
     folded: string[];
     multiselect?: boolean;
     pathSeperator?: string;
+    passWrapperProps?: (props: FileWrapperProps<T>) => Record<string, any> | null | undefined;
     FileComponent: ((props: FileProps<T>) => any) | typeof File;
+    FoldIcon?: (props: FoldIconProps) => any;
 
     originalInfos: T[];
     showFoldIcon?: boolean;
     isPadding?: boolean;
     gap?: number;
+    gapOffset?: number;
 
     nameProperty?:
     | (keyof T & string)
     | ((value: T, index: any, scope: any[]) => any);
     idProperty?:
     | (keyof T & string)
-    | ((value: T, index: any, scope: any[]) => string);
+    | ((value: T, index: any, scope: any[]) => string | number);
     childrenProperty?: (keyof T & string) | ((value: T, scope: any[]) => any);
     pathProperty?:
     | (keyof T & string)
@@ -53,7 +67,7 @@ export interface FolderProps<T> {
     infos: T[];
     originalInfos?: T[];
     FileComponent: ((props: FileProps<T>) => any) | typeof File;
-
+    FoldIcon?: (props: FoldIconProps) => any;
     scope?: string[];
     selected?: string[] | null;
     folded?: string[] | null;
@@ -65,21 +79,21 @@ export interface FolderProps<T> {
     display?: string;
     pathSeperator?: string;
     gap?: number;
-
+    gapOffset?: number;
     fontColor?: string;
     backgroundColor?: string;
     selectedColor?: string;
     borderColor?: string;
     guidelineColor?: string;
     iconColor?: string;
-
+    passWrapperProps?: (props: FileWrapperProps<T>) => Record<string, any> | null | undefined;
     urlProperty?: (id: string, scope: any[], value: T, index: any) => string;
     nameProperty?:
     | (keyof T & string)
     | ((value: T, index: any, scope: any[]) => any);
     idProperty?:
     | (keyof T & string)
-    | ((value: T, index: any, scope: any[]) => string);
+    | ((value: T, index: any, scope: any[]) => string | number);
     childrenProperty?: (keyof T & string) | ((value: T, scope: any[]) => any);
     pathProperty?:
     | (keyof T & string)

@@ -9,14 +9,16 @@ import {
     isEqualArray,
     prefix,
 } from "./utils";
-import { IObject, findIndex, hasClass, between, find, findLast } from "@daybrush/utils";
+import { IObject, findIndex, hasClass, between, find, isString } from "@daybrush/utils";
 import KeyController from "keycon";
 import Gesto, { OnDrag, OnDragStart, OnDragEnd } from "gesto";
 import styled, { StyledElement } from "react-css-styled";
 import { FileInfo, FolderProps, FolderState, MoveInfo } from "./types";
 import { prefixCSS, ref, refs } from "framework-utils";
-import { PREFIX } from "./consts";
+import { PREFIX, RootFolderContext } from "./consts";
 import FileManager from "./FileManager";
+import { DefaultFoldIcon } from "./DefaultFoldIcon";
+
 
 const FolderElement = styled(
     "div",
@@ -45,7 +47,7 @@ const FolderElement = styled(
   --folder-icon-color: inherit;
   --folder-font-color: inherit;
 }
-.fold-icon {
+.default-fold-icon {
   position: absolute;
   display: inline-block;
   vertical-align: middle;
@@ -55,7 +57,7 @@ const FolderElement = styled(
   top: 50%;
   transform: translateY(-50%);
 }
-.fold-icon:before {
+.default-fold-icon:before {
   content: "";
   position: absolute;
   left: 50%;
@@ -65,7 +67,7 @@ const FolderElement = styled(
   border-left: 3px solid transparent;
   border-right: 3px solid transparent;
 }
-.fold-icon.fold:before {
+.default-fold-icon.fold:before {
   border-right: 0;
   border-left: 4px solid var(--folder-icon-color);
   border-top: 3px solid transparent;
@@ -124,21 +126,23 @@ function getCurrentFile(target: HTMLElement) {
 
 export default class FolderManager<T extends {} = any>
     extends React.PureComponent<FolderProps<T>, FolderState<T>> {
-    public static defaultProps = {
+    public static defaultProps: Partial<FolderProps<{}>> = {
         scope: [],
-        name: "",
         selected: [],
         folded: [],
         onMove: () => { },
         checkMove: () => true,
         onSelect: () => { },
         gap: 15,
+        gapOffset: 0,
         urlProperty: (id: string) => id,
         pathProperty: (id: string, scope: string[]) => [...scope, id],
         idProperty: (_: any, index: number) => index,
         nameProperty: (_: any, index: number) => index,
         childrenProperty: () => [],
+        passWrapperProps: () => ({}),
         pathSeperator: "///",
+        FoldIcon: DefaultFoldIcon,
     };
     public moveGesto!: Gesto;
     public folderRef = React.createRef<StyledElement<HTMLDivElement>>();
@@ -149,77 +153,15 @@ export default class FolderManager<T extends {} = any>
     };
     private fileManagers: Array<FileManager<T>> = [];
     public render() {
-        const {
-            scope,
-            gap,
-            isPadding,
-            infos,
-            selected,
-            folded,
-            multiselect,
-            FileComponent,
-            nameProperty,
-            idProperty,
-            pathProperty,
-            childrenProperty,
-            showFoldIcon,
-            iconColor,
-            fontColor,
-            backgroundColor,
-            borderColor,
-            guidelineColor,
-            selectedColor,
-            originalInfos,
-            display,
-            pathSeperator,
-        } = this.props;
+        const rendered = this._renderFiles();
 
-        this.fileManagers = [];
-        return (
-            <FolderElement
-                className={prefix("folder")}
-                ref={this.folderRef}
-                style={{
-                    "--folder-icon-color": iconColor,
-                    "--folder-background-color": backgroundColor,
-                    "--folder-border-color": borderColor,
-                    "--folder-guideline-color": guidelineColor,
-                    "--folder-selected-color": selectedColor,
-                    "--folder-font-color": fontColor,
-                    display: display || "block",
-                }}
-            >
-                {infos.map((info, index) => {
-                    return (
-                        <FileManager<T>
-                            ref={refs(this, "fileManagers", index)}
-                            key={index}
-                            index={index}
-                            info={info}
-                            scope={scope!}
-                            selected={selected!}
-                            folded={folded!}
-                            FileComponent={FileComponent}
-                            isPadding={isPadding}
-                            gap={gap}
-                            multiselect={multiselect}
-                            showFoldIcon={showFoldIcon}
-                            nameProperty={nameProperty}
-                            idProperty={idProperty}
-                            childrenProperty={childrenProperty}
-                            pathProperty={pathProperty}
-                            originalInfos={originalInfos || infos}
-                            pathSeperator={pathSeperator}
-                        ></FileManager>
-                    );
-                })}
-                <div
-                    className={prefix("guideline")}
-                    ref={ref(this, "guidelineElement")}
-                ></div>
-                {this.renderShadows()}
-            </FolderElement>
-        );
+        if (!this.props.scope!.length) {
+            return <RootFolderContext.Provider value={this}>
+                {rendered}
+            </RootFolderContext.Provider>;
+        } else {
+            return rendered;
+        }
     }
     public componentDidMount() {
         KeyController.setGlobal();
@@ -247,12 +189,21 @@ export default class FolderManager<T extends {} = any>
 
         return folded && folded.indexOf(path) > -1;
     }
-    public findFile(targetPath: string): FileManager<T> | null {
+    public findFileInfo(targetPath: string | string[]): FileInfo<T> | null {
+        const targetPathUrl = isString(targetPath) ? targetPath : targetPath.join(this.props.pathSeperator!);
+        const children = this.flatChildren();
+
+        return find(children, child => {
+            return child.pathUrl === targetPathUrl;
+        }) || null;
+    }
+    public findFile(targetPath: string | string[]): FileManager<T> | null {
         const fileManagers = this.fileManagers;
         const length = fileManagers.length;
+        const targetPathUrl = isString(targetPath) ? targetPath : targetPath.join(this.props.pathSeperator!);
 
         for (let i = 0; i < length; ++i) {
-            const file = fileManagers[i].findFile(targetPath);
+            const file = fileManagers[i].findFile(targetPathUrl);
 
             if (file) {
                 return file;
@@ -261,7 +212,13 @@ export default class FolderManager<T extends {} = any>
         return null;
     }
     private renderShadows() {
-        const { FileComponent, nameProperty, scope, isPadding, gap } = this.props;
+        const {
+            FileComponent,
+            nameProperty,
+            scope, isPadding, gap,
+            passWrapperProps,
+            gapOffset,
+        } = this.props;
         if (scope!.length) {
             return;
         }
@@ -277,12 +234,36 @@ export default class FolderManager<T extends {} = any>
                         index,
                     } = info;
                     const name = getName(nameProperty, infoValue, index, scope);
-                    const gapWidth = gap! * (scope.length + 1);
+                    const gapWidth = gap! * (scope.length + 1) + gapOffset!;
+                    const className = prefix("file", "selected", "shadow");
+                    let style = {
+                        [isPadding ? "paddingLeft" : "marginLeft"]: `${gapWidth}px`,
+                        width: isPadding ? "100%" : `calc(100% - ${gapWidth}px)`,
+                    };
+                    const {
+                        style: passedStyle,
+                        ...otherProps
+                    } = passWrapperProps!({
+                        className,
+                        style,
+                        scope,
+                        name,
+                        value: infoValue,
+                        path,
+                        gapWidth,
+                        isSelected: true,
+                        isShadow: true,
+                    }) || {};
+
+                    if (passedStyle) {
+                        style = {
+                            ...style,
+                            ...passedStyle,
+                        };
+                    }
+
                     return (
-                        <div key={pathUrl} className={prefix("file", "selected", "shadow")} style={{
-                            [isPadding ? "paddingLeft" : "marginLeft"]: `${gapWidth}px`,
-                            width: isPadding ? "100%" : `calc(100% - ${gapWidth}px)`,
-                        }}>
+                        <div key={pathUrl} className={className} style={passedStyle} {...otherProps}>
                             <FileComponent<T>
                                 scope={fileScope}
                                 name={name}
@@ -840,4 +821,82 @@ export default class FolderManager<T extends {} = any>
             folded,
         });
     };
+    private _renderFiles() {
+        const {
+            scope,
+            gap,
+            gapOffset,
+            isPadding,
+            infos,
+            selected,
+            folded,
+            multiselect,
+            FileComponent,
+            FoldIcon,
+            nameProperty,
+            idProperty,
+            pathProperty,
+            childrenProperty,
+            showFoldIcon,
+            iconColor,
+            fontColor,
+            backgroundColor,
+            borderColor,
+            guidelineColor,
+            selectedColor,
+            originalInfos,
+            display,
+            pathSeperator,
+            passWrapperProps,
+        } = this.props;
+
+        this.fileManagers = this.fileManagers.slice(0, infos.length);
+
+        return (
+            <FolderElement
+                className={prefix("folder")}
+                ref={this.folderRef}
+                style={{
+                    "--folder-icon-color": iconColor,
+                    "--folder-background-color": backgroundColor,
+                    "--folder-border-color": borderColor,
+                    "--folder-guideline-color": guidelineColor,
+                    "--folder-selected-color": selectedColor,
+                    "--folder-font-color": fontColor,
+                    display: display || "block",
+                }}
+            >
+                {infos.map((info, index) => {
+                    return (<FileManager<T>
+                        ref={refs(this, "fileManagers", index)}
+                        key={index}
+                        index={index}
+                        info={info}
+                        scope={scope!}
+                        selected={selected!}
+                        folded={folded!}
+                        FoldIcon={FoldIcon}
+                        FileComponent={FileComponent}
+                        isPadding={isPadding}
+                        gap={gap}
+                        gapOffset={gapOffset}
+                        multiselect={multiselect}
+                        showFoldIcon={showFoldIcon}
+                        nameProperty={nameProperty}
+                        idProperty={idProperty}
+                        childrenProperty={childrenProperty}
+                        pathProperty={pathProperty}
+                        originalInfos={originalInfos || infos}
+                        pathSeperator={pathSeperator}
+                        passWrapperProps={passWrapperProps}
+                    />);
+                })}
+                <div
+                    className={prefix("guideline")}
+                    ref={ref(this, "guidelineElement")}
+                ></div>
+                {this.renderShadows()}
+            </FolderElement>
+        );
+    }
 }

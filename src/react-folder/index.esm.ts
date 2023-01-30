@@ -3,3 +3,4 @@ import File from "./File";
 
 export default Folder;
 export { File };
+export * from "./consts";
