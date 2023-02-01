@@ -45,6 +45,7 @@ export interface FileManagerProps<T extends {}> {
     FileComponent: ((props: FileProps<T>) => any) | typeof File;
     FoldIcon?: (props: FoldIconProps) => any;
 
+    preventSelect?: boolean;
     originalInfos: T[];
     showFoldIcon?: boolean;
     isPadding?: boolean;
@@ -86,6 +87,7 @@ export interface FolderProps<T> {
     borderColor?: string;
     guidelineColor?: string;
     iconColor?: string;
+    preventSelect?: boolean;
     passWrapperProps?: (props: FileWrapperProps<T>) => Record<string, any> | null | undefined;
     urlProperty?: (id: string, scope: any[], value: T, index: any) => string;
     nameProperty?:

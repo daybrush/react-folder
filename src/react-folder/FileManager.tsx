@@ -28,6 +28,7 @@ export default class FileManager<T extends {} = {}>
             pathSeperator,
             passWrapperProps,
             gapOffset,
+            preventSelect,
         } = this.props;
         const id = getId(idProperty, info, index, scope);
         const name = getName(nameProperty, info, index, scope);
@@ -106,6 +107,7 @@ export default class FileManager<T extends {} = {}>
                         childrenProperty={childrenProperty}
                         showFoldIcon={showFoldIcon}
                         selected={selected}
+                        preventSelect={preventSelect}
                         folded={folded}
                         isPadding={isPadding}
                         gap={gap}

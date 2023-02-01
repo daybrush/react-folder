@@ -27,10 +27,6 @@ const FolderElement = styled(
         `
 {
   position: relative;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
   --folder-selected-color: #5bf;
   --folder-border-color: #444;
   --folder-guideline-color: #4af;
@@ -38,6 +34,12 @@ const FolderElement = styled(
   --folder-icon-color: #fff;
   --folder-font-color: #fff;
   background: var(--folder-background-color);
+}
+:host.prevent-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 :host :host {
   --folder-selected-color: inherit;
@@ -127,6 +129,7 @@ function getCurrentFile(target: HTMLElement) {
 export default class FolderManager<T extends {} = any>
     extends React.PureComponent<FolderProps<T>, FolderState<T>> {
     public static defaultProps: Partial<FolderProps<{}>> = {
+        preventSelect: false,
         scope: [],
         selected: [],
         folded: [],
@@ -170,6 +173,7 @@ export default class FolderManager<T extends {} = any>
             this.moveGesto = new Gesto(folderElement, {
                 container: window,
                 checkInput: true,
+                preventDefault: false,
             })
                 .on("dragStart", this.onDragStart)
                 .on("drag", this.onDrag)
@@ -847,6 +851,7 @@ export default class FolderManager<T extends {} = any>
             originalInfos,
             display,
             pathSeperator,
+            preventSelect,
             passWrapperProps,
         } = this.props;
 
@@ -854,7 +859,7 @@ export default class FolderManager<T extends {} = any>
 
         return (
             <FolderElement
-                className={prefix("folder")}
+                className={prefix("folder", preventSelect ? "prevent-select" : "")}
                 ref={this.folderRef}
                 style={{
                     "--folder-icon-color": iconColor,
@@ -879,6 +884,7 @@ export default class FolderManager<T extends {} = any>
                         FileComponent={FileComponent}
                         isPadding={isPadding}
                         gap={gap}
+                        preventSelect={preventSelect}
                         gapOffset={gapOffset}
                         multiselect={multiselect}
                         showFoldIcon={showFoldIcon}
