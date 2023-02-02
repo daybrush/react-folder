@@ -9,7 +9,7 @@ import {
     isEqualArray,
     prefix,
 } from "./utils";
-import { IObject, findIndex, hasClass, between, find, isString } from "@daybrush/utils";
+import { IObject, findIndex, hasClass, between, find, isString, isArray } from "@daybrush/utils";
 import KeyController from "keycon";
 import Gesto, { OnDrag, OnDragStart, OnDragEnd } from "gesto";
 import styled, { StyledElement } from "react-css-styled";
@@ -145,6 +145,7 @@ export default class FolderManager<T extends {} = any>
         childrenProperty: () => [],
         passWrapperProps: () => ({}),
         pathSeperator: "///",
+        renderOnFolded: true,
         FoldIcon: DefaultFoldIcon,
     };
     public moveGesto!: Gesto;
@@ -183,15 +184,23 @@ export default class FolderManager<T extends {} = any>
     public componentWillUnmount() {
         this.moveGesto?.unset();
     }
-    public isSelected(path: string) {
-        const selected = this.props.selected;
+    public isSelected(path: string | string[]) {
+        const props = this.props;
+        const selected = props.selected;
+        const pathUrl = isArray(path)
+            ? path.join(props.pathSeperator)
+            : path;
 
-        return selected && selected.indexOf(path) > -1;
+        return selected && selected.indexOf(pathUrl) > -1;
     }
-    public isFolded(path: string) {
-        const folded = this.props.folded;
+    public isFolded(path: string | string[]) {
+        const props = this.props;
+        const pathUrl = isArray(path)
+            ? path.join(props.pathSeperator)
+            : path;
+        const folded = props.folded;
 
-        return folded && folded.indexOf(path) > -1;
+        return folded && folded.indexOf(pathUrl) > -1;
     }
     public findFileInfo(targetPath: string | string[]): FileInfo<T> | null {
         const targetPathUrl = isString(targetPath) ? targetPath : targetPath.join(this.props.pathSeperator!);
@@ -285,8 +294,9 @@ export default class FolderManager<T extends {} = any>
         const datas = e.datas;
 
         if (hasClass(e.inputEvent.target, prefix("fold-icon"))) {
+            e.inputEvent.stopPropagation();
             e.stop();
-            this.onClickFold(clickedFile);
+            this.fold(clickedFile);
             return false;
         }
         const fileInfos = this.flatChildren();
@@ -801,12 +811,21 @@ export default class FolderManager<T extends {} = any>
     private clearGuideline() {
         this.guidelineElement.style.display = "none";
     }
-    private onClickFold = (target: HTMLElement) => {
+    public fold = (target: string | string[] | HTMLElement) => {
         const {
             folded: propsFolded,
             pathSeperator,
         } = this.props;
-        const pathUrl = target.getAttribute("data-file-path")!;
+
+        let pathUrl = "";
+
+        if (target instanceof Element) {
+            pathUrl = target.getAttribute("data-file-path")!;
+        } else if (isArray(target)) {
+            pathUrl = target.join(pathSeperator);
+        } else {
+            pathUrl = target;
+        }
 
         const folded = [...(propsFolded || [])];
         const onFold = this.props.onFold;
@@ -824,7 +843,7 @@ export default class FolderManager<T extends {} = any>
             isFolded: !isFolded,
             folded,
         });
-    };
+    }
     private _renderFiles() {
         const {
             scope,
@@ -853,6 +872,7 @@ export default class FolderManager<T extends {} = any>
             pathSeperator,
             preventSelect,
             passWrapperProps,
+            renderOnFolded,
         } = this.props;
 
         this.fileManagers = this.fileManagers.slice(0, infos.length);
@@ -871,7 +891,7 @@ export default class FolderManager<T extends {} = any>
                     display: display || "block",
                 }}
             >
-                {infos.map((info, index) => {
+                {(renderOnFolded || display !== "none") && infos.map((info, index) => {
                     return (<FileManager<T>
                         ref={refs(this, "fileManagers", index)}
                         key={index}
@@ -884,6 +904,7 @@ export default class FolderManager<T extends {} = any>
                         FileComponent={FileComponent}
                         isPadding={isPadding}
                         gap={gap}
+                        renderOnFolded={renderOnFolded}
                         preventSelect={preventSelect}
                         gapOffset={gapOffset}
                         multiselect={multiselect}

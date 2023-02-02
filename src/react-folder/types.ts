@@ -51,6 +51,7 @@ export interface FileManagerProps<T extends {}> {
     isPadding?: boolean;
     gap?: number;
     gapOffset?: number;
+    renderOnFolded?: boolean;
 
     nameProperty?:
     | (keyof T & string)
@@ -87,6 +88,7 @@ export interface FolderProps<T> {
     borderColor?: string;
     guidelineColor?: string;
     iconColor?: string;
+    renderOnFolded?: boolean;
     preventSelect?: boolean;
     passWrapperProps?: (props: FileWrapperProps<T>) => Record<string, any> | null | undefined;
     urlProperty?: (id: string, scope: any[], value: T, index: any) => string;

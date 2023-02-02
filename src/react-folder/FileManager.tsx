@@ -29,6 +29,7 @@ export default class FileManager<T extends {} = {}>
             passWrapperProps,
             gapOffset,
             preventSelect,
+            renderOnFolded,
         } = this.props;
         const id = getId(idProperty, info, index, scope);
         const name = getName(nameProperty, info, index, scope);
@@ -94,7 +95,7 @@ export default class FileManager<T extends {} = {}>
                         />
                     </div>
                 </div>
-                {isFolder && (
+                {isFolder && (renderOnFolded || !isFolded) && (
                     <Folder<T>
                         ref={this.folderRef}
                         scope={nextScope}
@@ -109,6 +110,7 @@ export default class FileManager<T extends {} = {}>
                         selected={selected}
                         preventSelect={preventSelect}
                         folded={folded}
+                        renderOnFolded={renderOnFolded}
                         isPadding={isPadding}
                         gap={gap}
                         gapOffset={gapOffset}
