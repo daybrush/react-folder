@@ -12,7 +12,7 @@ import {
 import { IObject, findIndex, hasClass, between, find, isString, isArray } from "@daybrush/utils";
 import KeyController from "keycon";
 import Gesto, { OnDrag, OnDragStart, OnDragEnd } from "gesto";
-import styled, { StyledElement } from "react-css-styled";
+import { styled } from "react-css-styled";
 import { FileInfo, FolderProps, FolderState, MoveInfo } from "./types";
 import { prefixCSS, ref, refs } from "framework-utils";
 import { PREFIX, RootFolderContext } from "./consts";
@@ -149,7 +149,7 @@ export default class FolderManager<T extends {} = any>
         FoldIcon: DefaultFoldIcon,
     };
     public moveGesto!: Gesto;
-    public folderRef = React.createRef<StyledElement<HTMLDivElement>>();
+    public folderRef = React.createRef<HTMLDivElement>();
     public shadowRef = React.createRef<HTMLDivElement>();
     public guidelineElement!: HTMLElement;
     public state: FolderState<T> = {
@@ -170,7 +170,7 @@ export default class FolderManager<T extends {} = any>
     public componentDidMount() {
         KeyController.setGlobal();
         if (!this.props.isChild) {
-            const folderElement = this.folderRef.current!.getElement();
+            const folderElement = this.folderRef.current!;
             this.moveGesto = new Gesto(folderElement, {
                 container: window,
                 checkInput: true,
@@ -305,7 +305,7 @@ export default class FolderManager<T extends {} = any>
         datas.fileInfos = fileInfos;
 
 
-        const folderElement = this.folderRef.current!.getElement();
+        const folderElement = this.folderRef.current!;
 
         if (!this.props.isMove) {
             if (clickedFile) {

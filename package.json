@@ -1,6 +1,6 @@
 {
   "name": "@scena/react-folder",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "types": "./declaration/index.d.ts",
   "main": "./dist/folder.cjs.js",
   "module": "./dist/folder.esm.js",
@@ -61,10 +61,10 @@
     ]
   },
   "dependencies": {
-    "@daybrush/utils": "^1.10.2",
+    "@daybrush/utils": "^1.11.0",
     "framework-utils": "^1.1.0",
     "gesto": "^1.15.1",
     "keycon": "^1.4.0",
-    "react-css-styled": "^1.0.4"
+    "react-css-styled": "^1.1.0"
   }
 }

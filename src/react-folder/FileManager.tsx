@@ -1,6 +1,6 @@
 import * as React from "react";
 import Folder from "./FolderManager";
-import { FileInfo, FileManagerProps, FileProps } from "./types";
+import { FileManagerProps } from "./types";
 import { getChildren, getId, getName, getPath, prefix } from "./utils";
 
 export default class FileManager<T extends {} = {}>

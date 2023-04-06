@@ -1215,10 +1215,10 @@
   resolved "https://registry.npmjs.org/@daybrush/utils/-/utils-1.10.0.tgz#2a2235269b960b7ffaf05ca2e75379ea1fb58204"
   integrity sha512-IDT0DWAGcjxb2+WMr8pHrVTkHVKdilBumX1SubXJUlowN4rMSLphwDxvMNfv+vQOrdCPXSoPVZ3mhfrHsQ9Xow==
 
-"@daybrush/utils@^1.10.2":
-  version "1.10.2"
-  resolved "https://registry.npmjs.org/@daybrush/utils/-/utils-1.10.2.tgz#fb10bab437d1bb3d052fa49ca01f23c86a2ad1f1"
-  integrity sha512-fNMWeGUDokdIpebU8oIBUXkyGYITCwwodBfgx277p8d+kvI+k9wdFtKtdY4mvbWxhbAwuWprtVDq8My3KQ24Dg==
+"@daybrush/utils@^1.11.0":
+  version "1.11.0"
+  resolved "https://registry.npmjs.org/@daybrush/utils/-/utils-1.11.0.tgz#ad23a431fdb8f95ab4bb34fb6d080f2f7997a988"
+  integrity sha512-/T0Oe7KkfUoCusFj1cJ6N+Tu+jFZXVkaKqDBcDY3P0goJfcfaT+4+oG8aHi4LDgBErNjP6uvC3IEOSMe2ka/yQ==
 
 "@egjs/component@^3.0.2":
   version "3.0.2"
@@ -9104,10 +9104,10 @@ react-app-polyfill@^2.0.0:
     regenerator-runtime "^0.13.7"
     whatwg-fetch "^3.4.1"
 
-react-css-styled@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.npmjs.org/react-css-styled/-/react-css-styled-1.0.4.tgz#236ce398232dc152084bbf20540df1c971534174"
-  integrity sha512-nRske1bAKOCaf7Gf3o76tKQFIYggaW1qH4rutBlitH5lYnRPA7WoAYKrcxqdUPZd00oASg3SvFZSh3Mc1Wvj3w==
+react-css-styled@^1.1.0:
+  version "1.1.2"
+  resolved "https://registry.npmjs.org/react-css-styled/-/react-css-styled-1.1.2.tgz#c382da7d5afe7fb08a03ccfc82c8ec7822503481"
+  integrity sha512-YHTGOWaCLf7pASGRY3awG8rv67qyOjaUXUKfa3jFwzWges22SxYWQdMWIhCz7I8PXTrNRcIkemc6o2vVpd+gUA==
   dependencies:
     css-styled "~1.0.1"
     framework-utils "^1.1.0"
