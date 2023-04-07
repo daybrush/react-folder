@@ -1,6 +1,6 @@
 {
   "name": "@scena/react-folder",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "types": "./declaration/index.d.ts",
   "main": "./dist/folder.cjs.js",
   "module": "./dist/folder.esm.js",
@@ -65,6 +65,6 @@
     "framework-utils": "^1.1.0",
     "gesto": "^1.15.1",
     "keycon": "^1.4.0",
-    "react-css-styled": "^1.1.0"
+    "react-css-styled": "^1.1.2"
   }
 }

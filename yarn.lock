@@ -9104,7 +9104,7 @@ react-app-polyfill@^2.0.0:
     regenerator-runtime "^0.13.7"
     whatwg-fetch "^3.4.1"
 
-react-css-styled@^1.1.0:
+react-css-styled@^1.1.2:
   version "1.1.2"
   resolved "https://registry.npmjs.org/react-css-styled/-/react-css-styled-1.1.2.tgz#c382da7d5afe7fb08a03ccfc82c8ec7822503481"
   integrity sha512-YHTGOWaCLf7pASGRY3awG8rv67qyOjaUXUKfa3jFwzWges22SxYWQdMWIhCz7I8PXTrNRcIkemc6o2vVpd+gUA==
